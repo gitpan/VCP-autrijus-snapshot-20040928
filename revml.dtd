@@ -1,0 +1,328 @@
+<!-- DTD for RevML (see <revml> version attdef for version)
+     Authors: Barrie Slaymaker   <barries@slaysys.com>
+              Greg Kroah-Hartman <greg@kroah.com>
+              Sean McCune        <sean@sean-mccune.com>
+              John Fetkovich     <fetko@slaysys.com>
+-->
+
+<!-- The order is specified for the tags so that they are in an appropriate
+     order for an import utility.  Some of these constraints may be relaxed
+     in the future, but in general the metadata will always precede the
+     object data.  Import utilities *must* cache all necessary metadata
+     regardless of order of occurence, then may discard it once the
+     <content> is seen.
+
+      To compile a DTD in to a perl module:
+
+          vcp revml X-dtd *this*file* X-save-doctype
+
+      where "X" is a "-" (silly XML comments).  This will write
+      ./lib/RevML/Doctype/vV_VV_.pm where V_VV is the underscorified
+      version #FIXED attribute from the revml ENTITY definition below.
+
+-->
+
+<!ELEMENT revml
+    (
+        time,
+        rep_type,
+        rep_desc,
+        comment?,
+	rev_root,
+        branches?,
+        rev*
+    )
+>
+
+    <!--
+      NOTE!! When changing the dtd, this version number should be
+      changed also.  Any change also requires re-compiling the dtd
+      with bin/compile_dtd.  For more info run 'vcp help Maintenance'
+      and read the section titled 'Updating the RevML DTD.'
+    -->
+    <!ATTLIST   revml
+        version     CDATA   #FIXED   "0.35"
+    >
+
+<!ELEMENT rep_type (#PCDATA) >
+    <!-- 'p4', 'cvs', 'sourcesafe', etc. -->
+
+<!ELEMENT rep_desc (#PCDATA|char)* >
+    <!-- The version number, platform, etc. for the repository.  This
+         may be needed
+         so that import utilities can figure out what tags mean what
+         when a particular repository version changes.
+
+         This is often the output of 'p4 info' or 'cvs -v' + cvs
+         environment settings and the cvs -l command.
+
+    -->
+
+<!ELEMENT rev_root (#PCDATA|char)* >
+    <!-- The root of the tree that was extracted to RevML.  This
+         is usually the source file spec up to (but not including) the
+	 first component that does not contain a wildcard.
+
+         This comes before branches because it's needed to modify
+         branches, specifically the p4_branch_spec's View field.  That's
+         a theoretical issue as implemented, but it's nice to have
+         things in the safest, most mnemonic order, I think.
+    -->
+
+<!ELEMENT branch_id         (#PCDATA) >
+    <!-- cvs:      <branch_id>r_1_3_b</branch_id>
+         p4:       <branch_id>//depot/foo/devel</branch_id>
+
+         The contents of this element is used to identify the branch being
+         branch being exported.
+    -->
+
+<!ELEMENT p4_branch_spec (#PCDATA|char)* >
+    <!-- If the source repo was p4, then all branch specs with branch ids
+         used in the export are included, one per <branch> tag.  This may
+         be parsed by the destination (see the subroutines
+         VCP::Utils::p4->{parse,build}_p4_form()) or submitted directly
+         to the destination p4 repository.
+
+    -->
+
+
+<!ELEMENT rev
+    (
+        name,
+        source_name,
+        source_filebranch_id,
+        source_repo_id,
+	(
+	    (
+                type,
+                (branch_id,source_branch_id)?,
+                rev_id,
+                source_rev_id,
+                (change_id,source_change_id)?,
+                digest
+            )
+	    |(
+                type?,
+                (branch_id,source_branch_id)?,
+                rev_id,
+                source_rev_id,
+                (change_id,source_change_id)?,
+	        time?,
+	        mod_time?,
+	        user_id?,
+                label*,
+	        comment?,
+                previous_id,
+                (branch_creation|clone|placeholder)
+            )
+	    |(
+                type,
+	        (cvs_info|p4_info|source_safe_info|pvcs_info)?,
+	        (branch_id,source_branch_id)?,
+	        rev_id,
+                source_rev_id,
+	        (change_id,source_change_id)?,
+	        time,
+	        mod_time?,
+	        user_id,
+	        (p4_action|sourcesafe_action)?,
+	        label*,
+	        lock?,
+	        comment?,
+	        (move|(previous_id?,(content|delta),digest))
+	    )
+	    |(
+                type?,
+	        (cvs_info|p4_info|source_safe_info|pvcs_info)?,
+	        (branch_id,source_branch_id)?,
+	        rev_id?,
+                source_rev_id?,
+	        (change_id,source_change_id)?,
+	        time?,
+	        mod_time?,
+	        user_id?,
+	        (p4_action|sourcesafe_action)?,
+	        label*,
+	        lock?,
+	        comment?,
+                previous_id?,
+	        delete
+	    )
+	)
+    ) >
+    <!ATTLIST rev
+        id          CDATA         #REQUIRED
+    >
+    <!-- each <rev> must have a unique identifier, usually the name
+         and revision number, though the precise format depends on
+         the source repository.  The id should be derived from the
+         metadata in a repeatable fashion.
+    -->
+
+    <!-- A few words about the digest, content, and delta elements:
+
+         We could have allowed <content> or <delta> without the
+	 digest, but it's safer this way and the digest is small.
+	 <delta> tags should only be used for second and later <rev>s for
+	 a given <name>.
+
+	 A digest alone is only used for base revisions that should already
+	 be in the target repository, for incremental updates.  If there's
+	 no <delete/>, <move/> or <content>..</content> elements, it's
+	 a base rev digest.
+
+	 The first <rev> for a given name must not contain a <delta>.  It
+	 should contain <content> if this is not an incremental update, or
+	 just a <digest> if it is.
+	 
+	 The rev//digest with no <content> can only be used as the first
+	 <rev> in the file for a given <name>.  it indicates that the
+	 <rev_id> revision of <name> should be recovered from the target
+	 repository and then checked against the <digest> field.
+
+         <previous_id> contains the id string of the revision before this
+         one.
+
+    -->
+
+    <!-- The reason the <delete> variant is broken out is that VSS
+         does not associate much info with deletions or track them
+         per revision.  So, a delete can have some info in it for
+         other SCMs, but will be mostly empty for VSS.
+    -->
+
+    <!-- The second variant (optional type, no content/delta/delete) is
+         for marking branch points using placeholder revs -->
+
+    <!-- We will add repository_... tags as needed to carry along all necessary
+         repository specific information without alteration.
+    -->
+
+<!ELEMENT name          (#PCDATA|char)* >
+    <!-- the file name, in Unix format, relative to the repository root.
+         The file/directory names '.', '..', and '' are not legal.
+         cvs:       'src/iface/ftree/fi.c
+         p4:        'depot/perl/perl.c', not '//depot/perl/perl.c'
+
+         We will add vendor_... tags if this format causes loss of
+         information.
+    -->
+
+<!ELEMENT type          (#PCDATA) >
+    <!-- 'text' or 'binary' -->
+
+<!-- Product specific tags.  These are used when importing data in
+     to the same type of repository it was exported from.
+-->
+
+<!ELEMENT p4_info           (#PCDATA|char)* >
+
+<!ELEMENT cvs_info          (#PCDATA|char)* >
+
+<!ELEMENT source_safe_info  (#PCDATA|char)* >
+
+<!ELEMENT pvcs_info         (#PCDATA|trunk_rev_id|attrib|char)* >
+
+<!-- Repository-nuetral tags.  These must be generated by all export
+     utilities, and must be used by all import utilities when importing
+     from a foreign repository type.
+-->
+
+<!ELEMENT rev_id        (#PCDATA) >
+    <!-- A small integer indicating the revision number of a file
+         *within the branch*.
+
+         cvs:        "3" if the cvs rev is "1.3" 
+         p4:         the file revision number
+         sourcesafe: the file version number
+    -->
+
+<!ELEMENT change_id     (#PCDATA) >
+    <!-- Export utilities are responsible for grouping revisions together
+         using a unique change_id.  change_id's are integers starting at 1
+         for each file.
+    -->
+
+<!ELEMENT trunk_rev_id  (#PCDATA) >
+
+<!ELEMENT attrib        (#PCDATA) >
+
+<!ELEMENT lock          (time?, user_id) >
+
+<!ELEMENT time          (#PCDATA) >
+    <!-- All times are in ISO-8601 format in GMT/UCT0
+         <time>2000-12-31 23:59:59Z</time>
+    -->
+
+<!ELEMENT mod_time      (#PCDATA) >
+    <!-- Modification time -->
+    <!-- All times are in ISO-8601 format, GMT -->
+
+<!ELEMENT p4_action         (#PCDATA) >
+<!ELEMENT sourcesafe_action (#PCDATA) >
+
+<!ELEMENT label         (#PCDATA|char)* >
+
+<!ELEMENT user_id       (#PCDATA|char)* >
+
+<!ELEMENT comment       (#PCDATA|char)* >
+
+<!ELEMENT delete EMPTY >
+
+<!ELEMENT move (name) >
+    <!-- Where the file moved to -->
+
+<!ELEMENT delta (#PCDATA|char)* >
+    <!ATTLIST delta
+        type         (diff-u)       #REQUIRED
+        encoding     (none|base64)  #REQUIRED
+    >
+
+<!ELEMENT previous_id (#PCDATA) >
+
+<!ELEMENT content (#PCDATA|char)* >
+    <!ATTLIST content
+        encoding     (none|base64)  #REQUIRED
+    >
+
+<!ELEMENT digest      (#PCDATA) >
+    <!ATTLIST digest
+        type          (MD5)         #REQUIRED
+        encoding      (base64)      #REQUIRED
+    >
+
+<!ELEMENT char EMPTY >
+    <!ATTLIST char
+        code          CDATA         #REQUIRED
+    >
+    <!-- char elts are used to pass on control codes that would otherwise cause
+         the XML to be non-well-formed.  Each instance must have an attribute
+	 code containing a hexadecimal representation of the character code
+	 as string like "0x0c" (that for a ^L or form feed).
+    -->
+
+
+<!--
+  The following source_* fields are intended to keep the corresponding
+  fields without 'source_' in VCP all the way through to the
+  destination unchanged for making labels and logging.
+-->
+
+<!ELEMENT source_name          (#PCDATA|char)* >
+
+<!ELEMENT source_rev_id        (#PCDATA) >
+
+<!ELEMENT source_change_id     (#PCDATA) >
+
+<!ELEMENT source_branch_id     (#PCDATA) >
+
+<!--
+  These fields are similar in purpose to above, but don't have
+  directly corresponding analogues without the 'source_' prefix.
+-->
+
+<!ELEMENT source_filebranch_id (#PCDATA) >
+
+<!ELEMENT source_repo_id       (#PCDATA) >
+

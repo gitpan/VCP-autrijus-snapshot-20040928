@@ -1,0 +1,27 @@
+name: VCP-autrijus-snapshot-20040928
+module_name: VCP
+version: 0.9
+license: bsd
+distribution_type: module
+requires:
+  Pod::Usage: 0
+  Pod::Text: 0
+  HTML::Element: 0
+  Regexp::Shellish: 0.93
+  Text::Diff: 0
+  XML::ValidWriter: 0.38
+  MIME::Base64: 0
+  Digest::MD5: 0
+  File::Temp: 0
+  IPC::Run3: 0
+  Pod::HTML_Elements: 0
+  Pod::Select: 0
+  XML::Parser: 0
+  Pod::Links: 0
+no_index:
+  directory:
+    - bin
+    - lib
+    - t
+    - inc
+generated_by: Module::Install version 0.35

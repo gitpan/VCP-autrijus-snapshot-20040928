@@ -1,0 +1,894 @@
+#!/usr/local/bin/perl -w
+
+=head1 NAME
+
+vcp - Copy versions of files between repositories and/or RevML
+
+=head1 SYNOPSIS
+
+   # interactive mode:
+
+   vcp [vcp_opts]
+
+   # scriptable command line mode:
+
+   vcp [vcp_opts] <source> <dest>
+
+   # getting options from a file:
+
+   vcp vcp:config.vcp
+
+   # help output:
+
+   vcp help
+   vcp help [topic]
+
+=head1 DESCRIPTION
+
+C<vcp> ('version copy') copies versions of files from one repository to another,
+translating as much metadata as possible along the way.  This allows you to
+copy and translate files and their histories between revision storage systems.
+
+Supported source and destination types are C<cvs:>, C<p4:>, and C<revml:>.
+
+=head2 Copying Versions
+
+The general syntax of the vcp command line is:
+
+   vcp [<vcp options>] <source> <dest>
+
+The three portions of the command line are:
+
+=over
+
+=item C<E<lt>vcp optionsE<gt>>
+
+Command line options that control the operation of the C<vcp> command, like
+C<-d> for debugging or C<-h> for help.  There are very few global options,
+these are covered below. Note that they must come before the
+C<E<lt>sourceE<gt>> specification.
+
+=item C<E<lt>sourceE<gt>>
+
+Were to extract versions from, including any command line options needed to
+control what is extracted and how.  See the next section.
+
+=item C<E<lt>destE<gt>>
+
+Where to insert versions, including any command line options needed to control
+how files are stored.  See the next section.
+
+=back
+
+=head2 Specifying Repositories
+
+The C<E<lt>sourceE<gt>> and C<E<lt>destE<gt>> specifications specify a
+repository and provide any options needed for accessing that repository.
+
+These spefications may be a simple filename for reading or writing RevML
+files (if the requisite XML handling modules are installed). or a full
+repository specification like C<cvs:/home/cvs/root:module> or
+C<p4:user:password@server:port://depot/dir>.
+
+When using the long form to access a repository, C<E<lt>sourceE<gt>> and
+C<E<lt>destE<gt>> specification have several fields delimited by C<:>
+and C<@>, and may have trailing command line options.  The full (rarely
+used) syntax is:
+
+   scheme:user(view):password@repository:filespec [<options>]
+
+where
+
+=over
+
+=item C<scheme:>
+
+The repository type (C<p4:>, C<cvs:>, C<revml:>).
+
+=item C<user>, C<view>, and C<password>
+
+Optional values for authenticating with the repository and identifying which
+view to use.  C<cvs> does not use C<view>.  For C<p4>, C<view> is the client
+setting (equibalent to setting C<P4CLIENT> or using C<p4>'s C<-c> option).
+
+=item C<repository>
+
+The repository spec, CVSROOT for CVS or P4PORT for p4.
+
+=item C<filespec>
+
+Which versions of what files to move.  As much as possible, this spec is
+similar to the native filespecs used by the repository indicated by the scheme.
+
+=item C<E<lt>optionsE<gt>>
+
+Command line options that usually mimic the options provided by the underlying
+repositories' command line tools (C<cvs>, C<p4>, etc).
+
+=back
+
+Most of these fields are omitted in practice, only the C<scheme> field is
+required, though (in most cases) the C<repository> field is also needed unless
+you set the appropriate environment variables (C<CVSROOT>, C<P4PORT>, etc).
+
+The a bit confusing, here are some examples specs:
+
+   cvs:server:/foo
+   p4:user@server://depot/foo/...
+   p4:user:password@public.perforce.com:1666://depot/foo/...
+
+Options and formats for of individual schemes can be found in the relevant
+help topics, for instance:
+
+   vcp help source::cvs
+
+Run C<vcp help> for a list of topics.
+
+When reading and writing RevML files, a simple filename will do
+(although the long form may also be used).  The special value "-" means
+to read/write stdin and stdout when used as a source or destination
+name, respectively.  "-" is assumed if a specification is not provided,
+so these invocations all accomplish the same thing, reading and writing
+RevML:
+
+   vcp
+   vcp -
+   vcp revml:-
+   vcp revml:
+   vcp - -
+   vcp - revml:-
+   vcp - revml:
+   vcp revml:- revml:-
+   vcp revml: revml:
+
+=head2 C<vcp> Options
+
+All general options to vcp must precede the C<E<lt>sourceE<gt>>.
+Scheme-specific options must be placed immediately after the
+C<E<lt>sourceE<gt>> or C<E<lt>destE<gt>> spec and before the next one.
+
+=over
+
+=item --debug, -d
+
+Enables logging of debugging information.
+
+=item --help, -h, -?
+
+These are all equivalent to C<vcp help>.
+
+=item --output-config-file=$filename
+
+Write the settings (parsed from the UI, the command line, or a config
+file to a file.  Useful for capturing settings or user interface output.
+Does not affect running.  Use "-" to emit to STDOUT.
+
+B<NOTE 1>: This does I<not> emit an "Options:" section containing global
+options (those listed here).  Almost all of these options are not useful
+to emit; we can add an option to force their emission if need be.
+
+B<NOTE 2>: When using the interactive user interface, this option takes
+effect after the last interactive portion and, if vcp goes on to run a
+conversion, before any conversion is run.  This occurs in addition to
+any configuration files the user may ask the interactive interface to
+write.  This may change in the future (for instance, if the interactive
+dialog includes an option to extract and analyze metadata).  
+
+=item --dont-convert
+
+Do not run a conversion.  Useful when you just want to emit a .vcp file.
+
+=item --versions
+
+Emits the version numbers of bundled files.
+
+=item --terse, -t
+
+Suppress verbose explanations when running the interactive UI.  Has
+no effect on operation if all settings are read from the command line
+or a .vcp file.
+
+=item --quiet, -q
+
+Suppresses the banner and progress bars.
+
+=back
+
+=head2 Getting help
+
+(See also L<Generating HTML Documentation|/Generating HTML Documentation>,
+below).
+
+There is a slightly different command line format for requesting help:
+
+   vcp help [<topic>]
+
+where C<E<lt>topicE<gt>> is the optional name of a topic.  C<vcp help> without
+a C<E<lt>>topicC<E<gt>> prints out a list of topics, and C<vcp help vcp>
+emits this page.
+
+All help documents are also available as Unix C<man> pages and using the
+C<perldoc> command, although the names are slightly different:
+
+   with vcp               via perldoc        
+   ================       ===========
+   vcp help vcp           perldoc vcp
+   vcp help source::cvs   perldoc VCP::Source::cvs
+   vcp help source::cvs   perldoc VCP::Dest::p4
+
+C<vcp help> is case insensitive, C<perldoc> and C<man> may or may not be
+depending on your filesystem.  The C<man> commands look just like the example
+C<perldoc> commands except for the command name.  Both have the advantage that
+they use your system's configured pager if possible.
+
+=head2 Environment Variables
+
+The environment is often used to set context for the source and
+destination by way of variables like P4USER, P4CLIENT, CVSROOT, etc.
+
+=over
+
+=item VCPDEBUG
+
+The VCPDEBUG variable acts just like C<-d=$VCPDEBUG> was present on the
+command line:
+
+   VCPDEBUG=1
+
+(see L<"--debug, -d"> for more info).  This is useful when VCP is
+embedded in another application, like a makefile or a test suite.
+
+=back
+
+=for test_scripts t/10vcp.t t/50revml.t
+
+=cut
+
+## THIS ONLY WORKS WHILE IN THE DEVELOPMENT DIRECTORY, IT ASSUMES ALL
+## .pm AND .pod FILES ARE IN lib/ AND PAR <= 0.79 DOES NOT ALLOW US TO
+## GET AT THESE EASILY
+## 
+## =head2 Generating HTML Documentation
+## 
+## All of the help pages in C<vcp> can be built in to an HTML tree with the
+## command:
+## 
+##    vcp html <dest_dir>
+## 
+## The index file will be C<E<lt>dest_dirE<gt>/index.html>.
+## 
+## t/50revml.t is used too so that we actually make sure that filenames get
+## passed through to the source (at least) properly.
+## 
+
+use strict ;
+use File::Spec;
+
+BEGIN {
+   ## Massage @INC because we do a lot of lazy loading and relative
+   ## dirs in @INC give us fits
+   for ( @INC ) {
+      next if ref;
+      next if File::Spec->file_name_is_absolute( $_ );
+      $_ = File::Spec->rel2abs( $_ );
+   }
+
+   ## Check for options that must take effect ASAP
+   $ENV{VCPDEBUG}   ||= grep /\A(-d|--debug)\z/, @ARGV;
+   $ENV{VCPPROFILE} ||= grep /\A(--profile)\z/, @ARGV;
+   if ( grep /\A(--diestack)\z/, @ARGV ) {
+      $SIG{__DIE__} = sub {
+         local $SIG{__DIE__} = 'DEFAULT';
+         require Carp;
+         Carp::confess( @_ );
+      };
+      @ARGV = grep ! /\A(--diestack)\z/, @ARGV;
+   }
+}
+
+use VCP::Logger qw( lg pr set_quiet_mode BUG );
+use VCP::Debug qw( :debug ) ;
+use VCP::Utils qw( empty shell_quote program_name );
+use Getopt::Long ;
+use VCP ;
+
+my $program_name = program_name;
+
+my $quiet_mode;
+my $terse_ui_prompts;   ## set from command line
+my $output_config_file; ## Set from a command line.
+my $dont_convert;
+
+eval {
+   my $dtd_spec ;
+   my $arg = "";
+
+   lg shell_quote( $program_name, @ARGV );
+
+   my @plugins;
+
+   ## Parse up to the first non-option, then let sources & dests parse
+   ## from there.
+   Getopt::Long::Configure( qw( no_auto_abbrev no_bundling no_permute ) ) ;
+   parse_cli_options( \@ARGV );
+
+   my $interactive_ui = !@ARGV;  ## will also be set later if 'edit' arg
+   my $vcp_filename;  ## Set if we're to edit an existing file
+
+   if ( !$interactive_ui ) {
+      ## command line mode
+
+      $arg = $ARGV[0];
+#      build_html_tree_and_exit( $program_name, @ARGV[1..$#ARGV] )
+      die "HTML is now generated by developers at build time with\nbin/genhtml, sorry\n"
+         if $arg eq "html";
+      help_and_exit( @ARGV[1..$#ARGV] )
+         if $arg eq 'help' ;
+
+      my $vcp_spec;
+
+      if ( $arg eq "scan" || $arg eq "filter" || $arg eq "transfer" ) {
+         shift;
+      }
+
+      my @errors;
+
+      if ( $arg eq "edit" ) {
+         shift;
+         $interactive_ui = 1;
+         my $spec = shift;
+         if ( empty $spec ) {
+            push @errors, "edit requires a vcp configuration file name"
+         }
+         else {
+            require VCP::ConfigFileUtils;
+            ( $vcp_filename = $spec ) =~ s/^vcp://i;
+            $vcp_spec = VCP::ConfigFileUtils::parse_config_file(
+               $vcp_filename
+            );
+         }
+      }
+      else {
+         ## See if it's a config file: look for vcp: or .vcp or even
+         ## try sniffing it to see if it looks like one
+         my $source_spec = $ARGV[0];
+
+         require VCP::ConfigFileUtils;
+         my $is_vcp_file =
+            $source_spec =~ s/^vcp://i || $source_spec =~ /\.vcp\z/i;
+
+         my $cant_be_vcp_file = ! $is_vcp_file && (
+            $source_spec eq "-"   ## must be a revml file
+            || $source_spec =~ /\.revml\z/i
+            || $source_spec =~ /^\w{2,}:/ # ignore foo:, sniff C:
+            || ! -e $source_spec
+            || -S _ < 1_000_000       # That would be toooo big
+         );
+
+         $vcp_spec = $is_vcp_file
+            ? VCP::ConfigFileUtils::parse_config_file( $source_spec )
+            : ! $cant_be_vcp_file
+               ? VCP::ConfigFileUtils::parse_config_file(
+                  $source_spec,
+                  "may not be a config file"
+               )   # sniff the file, return FALSE if !vcp file
+               : 0;
+
+         if ( $vcp_spec ) {
+            $vcp_filename = $source_spec;
+            shift @ARGV;
+         }
+
+      };
+
+      if ( $vcp_spec ) {
+         ## It's a .vcp file parsed in to @$vcp_spec.
+         if ( @$vcp_spec && $vcp_spec->[0] eq "options" ) {
+            shift @$vcp_spec;
+            parse_cli_options( shift @$vcp_spec );
+         }
+
+         push @errors, "$vcp_filename does not specify a Source\n"
+            unless $arg eq "filter"
+               || ( $vcp_spec && @$vcp_spec && $vcp_spec->[0] eq "source" );
+
+         push @errors, "$vcp_filename does not specify a Destination\n"
+            unless $arg eq "scan" || $arg eq "filter"
+               || ( $vcp_spec && @$vcp_spec && $vcp_spec->[-2] eq "dest" );
+
+         push @errors,
+            "command line parameters not allowed when using config file: "
+            . join( " ", @ARGV )
+            . "\n"
+            if @ARGV;
+
+         while ( @$vcp_spec ) {
+            my ( $tag, $value ) = ( shift @$vcp_spec, shift @$vcp_spec );
+
+            my $default_scheme;
+            my $type;
+            my $spec;
+            my $parms;
+            # Unlike the command line, we know there *must* be a source
+            # and a dest in @$vcp_spec.  Anything in between is filters.
+            if ( $tag eq "source" || $tag eq "dest" ) {
+               $default_scheme = "revml";
+               $type = $tag;
+               $spec = shift @$value;
+            }
+            else {
+               $default_scheme = $tag;
+               $type = "Filter";
+               $spec = "";
+            }
+
+            print banner()
+               if !$quiet_mode
+                   && $type eq "dest"
+                   && length $spec
+                   && $spec ne "-";
+               ## Don't emit the banner if we're emitting to STDOUT.
+
+            push @plugins, load_module( $spec, $type, $default_scheme, $value );
+
+            die "extra parameters for $tag: ", shell_quote( @$value ), "\n" 
+               if @$value;
+         }
+      }
+      else {
+         ## Parse the command line.
+         my $type = "Source";
+         while ( @ARGV ) {
+            my $spec = shift;
+
+            my $default_scheme;
+            if ( $type eq "Source" ) {
+               $default_scheme = "revml";
+            }
+            elsif ( $type ne "Dest" && find_filter( $spec ) ) {
+               ## It's a filter.
+               $type = "Filter";
+            }
+            else {
+               $type           = "Dest";
+               $default_scheme = "revml";
+            }
+
+           print banner()
+               if !$quiet_mode
+                   && $type eq "Dest"
+                   && length $spec
+                   && $spec ne "-";
+               ## Don't emit the banner if we're emitting to STDOUT.
+
+            ## We pass \@ARGV to the constructors for source and dest so
+            ## that they may parse some of @ARGV and leave the rest.
+            ## Actually, that's only important for sources, since the
+            ## dests should consume it all anyway.  But, for
+            ## consistency's sake, I do the same to both.
+            push @plugins, load_module( $spec, $type, $default_scheme, \@ARGV );
+            $type = "";
+
+            ## Fake up a destination if none was passed.
+            push( @ARGV, "revml:-" ), $type = "Dest"
+               if ! @ARGV && ! $plugins[-1]->isa( "VCP::Dest" ) ;
+         }
+
+         push @errors, "extra parameters: " . join( ' ', @ARGV ) . "\n"
+            if @ARGV;
+      }
+
+
+      if ( @errors ) {
+         my $errors = join( '', @errors ) ;
+         $errors =~ s/^/$program_name ERROR: /mg ;
+         chomp $errors;
+         die $errors, "\n" ;
+      }
+   }
+
+   if ( $interactive_ui ) {
+      ### interactive mode
+      print banner() if !$quiet_mode;
+      
+      require VCP::UI;
+      my $ui = VCP::UI->new( 
+         defined $terse_ui_prompts ? ( TersePrompts => 1 ) : (),
+      );
+
+      print <<END_INTRO unless @plugins || defined $terse_ui_prompts;
+
+This is vcp's text mode interactive user interface.  It asks a series of
+questions and then allows you to save the answers in a configuration
+file and/or do a conversion based on them.
+
+After each question any example free-form input is shown in parentheses.
+If a default value is available, that is shown in square brackets.  You
+may press 'Enter' to accept the default.  For yes/no questions, 'y' or
+'n' is sufficient.  For non-yes/no multiple choice questions, use the
+number or enter the entire choice text.
+
+vcp may also be provided with all the information it needs on the
+command line or using a configuration file.  To read up on these
+options, run "vcp help" from the command line after quitting the
+interactive interface.
+
+END_INTRO
+
+      my ( $source, $dest, $do_convert );
+      ( $source, $dest, $output_config_file, $do_convert ) = $ui->run(
+         @plugins
+            ? (
+               Source   => $plugins[ 0],
+               Dest     => $plugins[-1],
+               Filename => $vcp_filename,
+            )
+            : ()
+      );
+
+      $dont_convert = 1 unless $do_convert;
+
+      if ( ! @plugins ) {  ## None scanned from existing .vcp file
+         push @plugins, $source;
+
+         require VCP::DefaultFilters;
+         my $df = VCP::DefaultFilters->new;
+         my @filter_args = $df->create_default_filters( $source, $dest );
+
+         # call load_module for each filter in @filter_args.
+         while ( @filter_args ) {
+            my $spec = shift @filter_args;
+
+            my $default_scheme;
+            if ( find_filter( $spec ) ) {
+               push @plugins, load_module(
+                  $spec, "Filter", undef, \@filter_args
+               );
+            }
+            else {
+               BUG "attempted to load a non-existent default filter: $spec";
+            }
+         }
+
+         push @plugins, $dest;
+      }
+      else {
+         $plugins[ 0] = $source;
+         $plugins[-1] = $dest;
+      }
+
+   }
+
+   if ( $arg eq "scan" ) {
+      @plugins = (
+         $plugins[0],
+         load_module( "metadb:source_metadb:", "Dest", undef, [] ),
+      );
+   }
+   elsif ( $arg eq "filter" ) {
+      shift @plugins; ## filtering requires no source and no dest
+      pop @plugins;
+      pr "vcp: no filters to apply\n" unless @plugins;
+      @plugins = (
+         load_module( "metadb:source_metadb:", "Source", undef, [] ),
+         @plugins,
+         load_module( "metadb:filtered_metadb:", "Dest", undef, [] ),
+      );
+   }
+   elsif ( $arg eq "transfer" ) {
+      @plugins = (
+         load_module( "metadb:filtered_metadb:", "Source", undef, [
+            $plugins[0],
+         ] ),
+         $plugins[-1],
+      );
+   }
+
+   if ( defined $output_config_file ) {
+      require VCP::ConfigFileUtils;
+      VCP::ConfigFileUtils::write_config_file( $output_config_file, @plugins );
+   }
+
+   unless ( $dont_convert ) {
+      # init should:
+      #   set default values don't make sense in the constructor
+      #   do initialization that doesn't make sense in constructor
+      #   do cross-checking between fields
+      $_->init for @plugins;
+
+      my $cp = VCP->new( @plugins );
+      $cp->insert_required_sort_filter
+         unless $arg eq "scan" || $arg eq "transfer";
+      my $header = {} ;
+      my $footer = {} ;
+      $cp->copy_all( $header, $footer ) ;
+   }
+
+   1;
+
+} or do {
+   my $x = $@;
+   lg $x;
+   die $x;
+};
+
+###############################################################################
+###############################################################################
+
+sub parse_cli_options { 
+   local *ARGV = shift @_;
+   GetOptions(
+      'debug|d'              => \my $unused_1_see_BEGIN_above,
+      'dont-convert'         => \$dont_convert,
+      'output-config-file=s' => \$output_config_file,
+      'help|h|?:s'  => sub {
+         help_and_exit( length $_[1] ? $_[1] : () );
+      },
+      'profile'              => \my $unused_2_see_BEGIN_above,
+      'quiet|q'              => \$quiet_mode,
+      'terse|t'              => \$terse_ui_prompts,
+      'versions'             => \&versions_and_exit,
+   ) or options_and_exit() ;
+
+   set_quiet_mode( $quiet_mode );
+   die "--output-config-file requires a filename\n"
+      if defined $output_config_file && ! length $output_config_file;
+}
+
+
+sub load_module {
+   my ( $spec, $type, $default_scheme, @args ) = @_;
+
+   $type = ucfirst $type;
+
+   my $class = "VCP::$type";
+
+   my ( $scheme, $s ) = $spec =~ /^(\w{2,}):/
+      ? ( $1, $spec )
+      : defined $default_scheme
+         ? ( $default_scheme, "$default_scheme:$spec" )
+         : die "vcp: '$spec' has no scheme, try ",
+            list_modules( $class ),
+            "\n";
+   $scheme = lc($scheme);
+
+   my $name = "${class}::$scheme";
+
+   my $filename = $name ;
+   $filename =~ s{::}{/}g ;
+
+   my $v = eval "require '$filename.pm';" ;
+   die "unknown \L$type\E scheme '$scheme:', try ",
+      list_modules( $class ),
+      "\n"
+      if ! $v && $@ =~ /^Can't locate $filename.pm/ ;
+   die $@ unless $v;
+
+   lg "loaded '$name' from '", $INC{"$filename.pm"}, "'";
+
+   # New should: 
+   #   construct the object
+   #   parse options, if preent     
+   #   set some default values
+   #   do some initialization       
+   my $module = $name->new( $s, @args ) ;
+
+   return $module;
+}
+
+
+{
+   my $filters;
+   sub find_filter {
+      my $spec = shift;
+
+      return(
+         $spec =~ /\A(\w{2,}):/ ## filters *must* have a scheme
+         && do {
+            my $scheme = lc $1;
+            $filters ||= {
+               map { ( $_ => undef ) } scan_modules( "VCP::Filter" )
+            };
+            exists $filters->{$scheme};
+         }
+      );
+   }
+}
+
+
+sub inc_dirs {
+   ## PAR plays coderef-in-@INC games with @INC.
+   ## And even if it didn't, we don't want to scan the same dir multiple
+   ## times.
+   my %seen_dirs;
+   return
+   grep
+       ref ne "CODE" && !$seen_dirs{$_}++ && -d,
+       @INC;
+}
+
+## PAR <= 0.79 does not allow us to walk @INC directory trees, so we hard code
+## the list of modules in this hash in bin\build_vcp_executable.pl
+
+BEGIN {
+   my @bundled_files = grep length, ( "",
+       ## The grep is to work around a bug in perl5.8.4 that
+       ## causes a "Bizarre copy of ARRAY in leavesub.  This is untested
+       ## for now (2004-09-08), but should work.
+       ## INSERT BUNDLED FILES LIST HERE ##
+   );
+
+   sub bundled_files {
+      unless ( @bundled_files ) {
+         require File::Spec;
+         require File::Find;
+         my %seen;
+         for ( inc_dirs ) {
+            next if ref eq "CODE";
+            for my $dir (
+                File::Spec->catdir( $_, "VCP" ),
+                File::Spec->catdir( $_, "RevML" )
+            ) {
+               next if ! -d $dir;
+
+               File::Find::find(
+                  sub {
+                     return unless -f $_ && $_ =~ /\.pm\z/i;
+                     no warnings 'once';
+                     my $fn = $File::Find::name;
+                     $fn =~ s{[\\\/]+}{/}g;
+                     $fn =~ s{^.*/(RevML|VCP)/}{$1/}i
+                        if File::Spec->file_name_is_absolute( $fn );
+                     $fn =~ s{lib/+}{};
+                     push @bundled_files, $fn unless $seen{$fn}++;
+                  },
+                  $dir
+               );
+            }
+         }
+      }
+
+      return @bundled_files;
+   }
+}
+
+sub scan_modules {
+   my ( $prefix ) = @_ ;
+
+   my $dirname = $prefix . '::' ;
+   $dirname =~ s{(::)+}{/}g ;
+
+   my $l = length $dirname;
+
+   return
+      map {
+         my $module_name = substr( $_, $l );
+         $module_name =~ s/\.pm//i
+             ? $module_name
+             : ();
+      }
+      grep substr( $_, 0, $l ) eq $dirname, bundled_files;
+}
+
+
+sub list_modules {
+   my ( $prefix ) = @_ ;
+
+   my $list = join ', ', map "$_:", scan_modules( @_ );
+   $list =~ s/,([^,]*)$/ or$1/ ;
+   return $list ;
+}
+
+
+sub options_and_exit {
+   lg @_;
+   require VCP::Help;
+   print STDERR "\n";
+   VCP::Help->error( "vcp usage" );
+   exit 1;
+}
+
+
+sub help_and_exit {
+   my ( $topic ) = @_;
+   require VCP::Help;
+   VCP::Help->print( $topic );
+   exit;
+}
+
+sub banner {
+   "vcp v$VCP::VERSION, change number $VCP::CHANGE_ID ($VCP::DATE)\n";
+}
+
+
+sub versions_and_exit {
+   for ( bundled_files ) {
+      next unless m/\.pm$/i ;
+      my $module = $_;
+      $module =~ s/\..*//;
+      $module =~ s{[\\/]+}{::}g;
+      ## Avoid "name used only once" warning
+      eval "require $module" or warn $@;
+   } ;
+
+   my %vers ;
+   my %no_vers ;
+
+   my $recur ;
+   $recur = sub {
+      my ( $pkg_namespace ) = @_ ;
+
+      no strict "refs" ;
+
+      my $pkg_name = substr( $pkg_namespace, 0, -2 ) ;
+
+      ## The grep means "only bother with namespaces that contain somthing
+      ## other than child namespaces.
+      if ( ! grep /::/, keys %{$pkg_namespace} ) {
+         if ( exists ${$pkg_namespace}{VERSION} ) {
+	    $vers{$pkg_name} = ${"${pkg_namespace}VERSION"}
+	 }
+	 else {
+	    $no_vers{$pkg_name} = undef ;
+	 }
+      }
+
+      my $prefix = $pkg_namespace eq "main::" ? "" : $pkg_namespace ;
+      for ( keys %{$pkg_namespace} ) {
+	 next unless /::$/ ;
+	 next if /^main::/ ;
+	 $recur->( "$prefix$_" ) ;
+      }
+   } ;
+
+   $recur->( "main::" ) ;
+
+   my $max_len = 0 ;
+   $max_len = length > $max_len ? length : $max_len for keys %vers ;
+      
+   print "Package \$VERSIONs:\n" ;
+   for ( sort keys %vers ) {
+      printf(
+         "   %-${max_len}s: %s\n",
+	 $_,
+	 defined $vers{$_} ? $vers{$_} : "undef"
+      ) ;
+   }
+
+   print "No \$VERSION found for: ", join( ", ", sort keys %no_vers ), "\n" ;
+
+   $max_len = 0 ;
+   $max_len = length > $max_len ? length : $max_len for values %INC ;
+   print "\nFile sizes:\n" ;
+   for ( sort values %INC ) {
+      printf( "   %-${max_len}s: %7d\n", $_, -s $_ ) ;
+   }
+
+   print "\nperl -V:\n" ;
+
+   my $v = `$^X -V` ;
+   $v =~ s/^/   /gm ;
+   print $v ;
+
+   exit ;
+}
+
+=head1 SEE ALSO
+
+L<VCP::Process>, L<VCP::Newlines>, L<VCP::Source::p4>, L<VCP::Dest::p4>,
+L<VCP::Source::cvs>, L<VCP::Dest::cvs>, L<VCP::Source::revml>,
+L<VCP::Dest::revml>, L<VCP::Newlines>.  All are also available using C<vcp
+help>.
+
+=head1 AUTHOR
+
+Barrie Slaymaker <barries@slaysys.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000, 2001, 2002 Perforce Software, Inc.
+All rights reserved.
+
+See L<VCP::License|VCP::License> (C<vcp help license>) for the terms of use.
+
+=cut

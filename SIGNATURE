@@ -1,0 +1,195 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e78815c6e06759cf1164346a181db220e3cdcdda CHANGES
+SHA1 ba0be6e89832e4d7f52a43c83f72b2999b124e28 INSTALL
+SHA1 0e50460d3bb97872d6aafc857eac02ff7875f146 LICENSE
+SHA1 138c47317be8f1afa110eac256330b9bb72a00ea MANIFEST
+SHA1 043995ede5a2775485a3e83663da52515c4b5dd6 MANIFEST.SKIP
+SHA1 c2e58ba02756718786d2aa7b837d3d80edb342b9 META.yml
+SHA1 d64288791915599a5ff9c5a080623296092e53e8 Makefile.PL
+SHA1 35f69605eedece5835268dc53765b8e7ba18ed52 README
+SHA1 7aad0d75d6dac86959d949800147297ada035ed6 TODO
+SHA1 119ee890d9b90d838187540fdd0d7589c11dfbed bin/analyze_profile
+SHA1 d36d71652d7f339a8de6a6c2b9730cdcecdf244a bin/build_vcp_executable.pl
+SHA1 e8e631f6679732516653da3b8d1ed9488f91ba05 bin/compile_dtd
+SHA1 b138218332529557aef4535b06c311b8a60c50df bin/dump_files
+SHA1 1926c8976cdcca2d15e1cb22c18e08d8f1f32b58 bin/dump_head_revs
+SHA1 ffc72ff78255f0b9e2f8a53fb3b9de9a71a4b29c bin/dump_main_branch_id
+SHA1 96c7cd0278a6b1695f34d75f3bfae97edf6aede5 bin/dump_rev_map
+SHA1 903fd36a6547970becd54137f0d61eba8fd7749e bin/genhelp
+SHA1 e72e8c420faf971e796ef8415705277d7b78fcd4 bin/genhtml
+SHA1 9e46dcca43a9119af58534428b07ce8f11656d49 bin/gentrevml
+SHA1 513e69ca9f828e1f075ac04a750c42ce572d62b1 bin/hexdump.pl
+SHA1 354ec9ea44b1d86a4a3396a1e0d050adf2419b02 bin/test_vcp_executable.pl
+SHA1 874d7313744de72ad48ee8759fd8abe814911db3 bin/vcp
+SHA1 b26ac27e5a57677aa210c0e908b28ff3ba28f03b inc/Module/Install.pm
+SHA1 fd56d5c793014bccac2cd1e61926c4da8538ef99 inc/Module/Install/Base.pm
+SHA1 dd03eda9a9efade2c68c85e469b440f1d6e5302d inc/Module/Install/MakeMaker.pm
+SHA1 aabcd47178e4e7b27e340ff5273269c93697c9c1 inc/Module/Install/Makefile.pm
+SHA1 207dfa13341a374fc78325fbeb99bc36659aef2d inc/Module/Install/Metadata.pm
+SHA1 f395bcf578c1c79d736c252fa4fea5c1c4a3ca0e lib/RevML/Doctype.pm
+SHA1 9eac875bfb9715cf8211aa9023e4c08487ceb111 lib/RevML/Doctype/v0_35.pm
+SHA1 99ac0fc2f67cd1dbaeb49fc965bbb105a4628328 lib/RevML/Writer.pm
+SHA1 23eeeb45e4af0fe486e9d0da692324c341d2ee39 lib/VCP.pm
+SHA1 14f55d8d3c4579475ec0574a9f25084cb5b32667 lib/VCP/Branches.pod
+SHA1 7395532a3ce15f8d01de2bf2e4217a352b278ade lib/VCP/ConfigFileUtils.pm
+SHA1 8feb6ade0af43fda24f4e92a06130bc4a7c0df9f lib/VCP/DB.pm
+SHA1 6aa660f3ff8d6b21edca7d41e13240c6eca89664 lib/VCP/DB_File.pm
+SHA1 7a67c00c701280803b17f2c6842a226ee13b22a0 lib/VCP/DB_File/big_records.pm
+SHA1 0eaf0930b19453f329ed05c0c7a79405dc148cbe lib/VCP/DB_File/sdbm.pm
+SHA1 975aac8e782a0d83e77e2872c1639cbd989c3908 lib/VCP/Debug.pm
+SHA1 cc12184b0da4b76a0b199747b655ac603fd02c7f lib/VCP/DefaultFilters.pm
+SHA1 15157075bde1e4e7ef8a593a6dde934b58f785ba lib/VCP/Dest.pm
+SHA1 74fe2d98baef443243618d57d17602496d6f85ed lib/VCP/Dest/branch_diagram.pm
+SHA1 d641bea7c97cc7bfd45bde5d8c4d08f523afd4eb lib/VCP/Dest/csv.pm
+SHA1 e4e8e099e9bb116627dea55e0fdf06689a77e660 lib/VCP/Dest/cvs.pm
+SHA1 1cd3736f43393ed93d421bd363184b451d993813 lib/VCP/Dest/data_dump.pm
+SHA1 861e1a135c15f2c5c81d08884e93290ea1d759ce lib/VCP/Dest/metadb.pm
+SHA1 a6860fc052674886cba556c48194ae6cf9d1c382 lib/VCP/Dest/null.pm
+SHA1 0ed48a45cb407bb4b962df84e623adbfd3252f5b lib/VCP/Dest/p4.pm
+SHA1 e470c265890c4cce1cf16b9303053ad5b98bcbe1 lib/VCP/Dest/revml.pm
+SHA1 b0c322664e692c7dea767984b18b0d3a4fd7c603 lib/VCP/Dest/summary.pm
+SHA1 262d9f2d07c900dfd6f24f0265974140320863fd lib/VCP/Dest/texttable.pm
+SHA1 d36e4e7e53bff531be24a987fd457726db328804 lib/VCP/Dest/topo_table.pm
+SHA1 b309e4382b943accbbd1e0c98d1bd5c509974f18 lib/VCP/Dest/vss.pm
+SHA1 33f30bd697e29ac4ecaeb9c5360d344f79159359 lib/VCP/DiffFormat.pm
+SHA1 41e0e3930025d7217ce90b8326f445eab968fe92 lib/VCP/Driver.pm
+SHA1 7e11ff8e65499abcf694f092eba0cfa88170e511 lib/VCP/FilesDB.pm
+SHA1 058f1101deba30333d4c1e919bfd658504373be9 lib/VCP/Filter.pm
+SHA1 64946ec42fa5f30b6c950ad76289f9968eaae091 lib/VCP/Filter/addlabels.pm
+SHA1 150dd5394986f2d3e46191d0392ab95335a73e25 lib/VCP/Filter/changesets.pm
+SHA1 1d0deafbd7c34599c9cfbd9501b4b1e2c8968312 lib/VCP/Filter/csv_trace.pm
+SHA1 97dab7e0ae81f865ed696f606debaaaa2185877a lib/VCP/Filter/dumpdata.pm
+SHA1 39d73723a1ebe64650937d91f7e7efe6af2093b8 lib/VCP/Filter/identity.pm
+SHA1 14e9b259f8baef0dfbae38040ad31d39badcf9dc lib/VCP/Filter/labelmap.pm
+SHA1 a4b3728744f14ffac7bde183b4257780e124a64c lib/VCP/Filter/logmemsize.pm
+SHA1 44d9e7a57347314a6efe05e18b829de51d1be844 lib/VCP/Filter/map.pm
+SHA1 1d23e478ffc8726d99dd0ae8fb8e46e64864f363 lib/VCP/Filter/sort.pm
+SHA1 ddb2a3b8f9115b39aa64e305df0a56d3c8dd42f3 lib/VCP/Filter/stringedit.pm
+SHA1 a115f38ca01168dda2069b97622c73e69e0c8375 lib/VCP/HeadRevsDB.pm
+SHA1 7b278d568fc744b2fd06ab9a25b353f66ec3969c lib/VCP/License.pod
+SHA1 8daeb8b147403d8d90a5a8a5dc61017467abc14b lib/VCP/Logger.pm
+SHA1 c45b9babaa67583c639c714fb06eeeb5f6e3e422 lib/VCP/MainBranchIdDB.pm
+SHA1 1bc1eb837482edf72cc866337113aeb087a12c3c lib/VCP/Maintenance.pod
+SHA1 ade3d0ed386706f3afe9b29cbb5c8cd541ac22c1 lib/VCP/Newlines.pod
+SHA1 536caadd0e7321eac926ea9ccf91ab61b5434e3a lib/VCP/Patch.pm
+SHA1 c1c4034fd9039455f28348e3a5e1a7a7bf477050 lib/VCP/Plugin.pm
+SHA1 1bc788a0fc5d04542074fabf477c0665789dd91f lib/VCP/PodDESCRIPTIONParser.pm
+SHA1 91cbf754034dcdf2a60c9bc8966d676ddb681894 lib/VCP/PodOPTIONSParser.pm
+SHA1 12613b9102a8bda975a1dbae50de604df7f59877 lib/VCP/Process.pod
+SHA1 213f086e798281c51fbfd986e530e3f9f0425091 lib/VCP/RefCountedFile.pm
+SHA1 85ea6335b6563d93497fe530e98064a523a91203 lib/VCP/Rev.pm
+SHA1 b86d5d3396d7d044704c5d7e4c90804a71b10820 lib/VCP/RevMapDB.pm
+SHA1 0b99e1fcce0bd031ddc5c90eea72a7f084c9bba7 lib/VCP/Revs.pm
+SHA1 407c8b79a20a54bf4bae1027d5e0bc3f0e087285 lib/VCP/Source.pm
+SHA1 d4c6d6a73acdf9474654b32c3ab5eb3383b52b88 lib/VCP/Source/cvs.pm
+SHA1 02b1d6be5932764cff3ebec5cc297f2bd5ed9280 lib/VCP/Source/metadb.pm
+SHA1 50c4b0f45a9ac6d7ea9b4236a678b9dd7fac295d lib/VCP/Source/null.pm
+SHA1 cafc7d22a046e6722d619723eda7475a7d23c2ea lib/VCP/Source/p4.pm
+SHA1 def4936cc075b3ea4cba33bd7d5cb5f4c5b679a6 lib/VCP/Source/revml.pm
+SHA1 a6ebd562e653b0af189323d436fa073e61d6ada8 lib/VCP/Source/vss.pm
+SHA1 7d9c30f2ac0f84df27d08b13da150dfd994afb7c lib/VCP/TestUtils.pm
+SHA1 2dd3cdbcbedf5677618574a0cf58eb3061e40088 lib/VCP/UI.pm
+SHA1 8fbcb356f28318588899ff20fbf28a7c907e5f74 lib/VCP/UI/Text.pm
+SHA1 8c8f72d273a9fd62a89880367ad7a2400bf971dc lib/VCP/UIMachines.pm
+SHA1 a6cf818938861b2779a5542d86246d6a30a94860 lib/VCP/Utils.pm
+SHA1 0c9042d99db94cd8263b103a8246acfebc4bbde8 lib/VCP/Utils/cvs.pm
+SHA1 2ba6c85142725ca4804b8bbea18d402d21ca27d1 lib/VCP/Utils/metadb.pm
+SHA1 b9152315c157466bd8d7ecc8c1e8619da6eeab7f lib/VCP/Utils/p4.pm
+SHA1 b1eb6c9346eae66bd035cd29f78b2bbb1f794996 lib/VCP/Utils/revml.pm
+SHA1 bba8179902b0fb208759093e77b15b5dde4379b7 lib/VCP/Utils/vss.pm
+SHA1 59bd4aae023ced981defae96fb4621519095b421 p4version
+SHA1 a690036b255c8354d9049e7ab6a36d0caa1352a5 revml.dtd
+SHA1 eed3011dc77a8cb4041c1a918e5a88a18d446942 t/00default_filter.t
+SHA1 b048508439241dd598eb1ac1ebd318424096abeb t/00filter.t
+SHA1 549a9521c2c9d87e8f71951416ba96556b733107 t/00logger.t
+SHA1 493b60997a8ea03b85025d9d70e2593a3e1c589b t/00p4form.t
+SHA1 b3506d15ff1c59df398aa6ec3f802fc854c3bdc2 t/00patch.t
+SHA1 c47ded3062fe9b8feecf5cee40e553f30dd5d9b5 t/00plugin.t
+SHA1 705b433fd30afbd092cef54ce2b4008175882318 t/00refcountedfile.t
+SHA1 1a98ae5e09b7a79c41fb65cedbfb145beedf58b9 t/00rev.t
+SHA1 0ae0c38555f78e7018ebb8af1b176dc1489970cc t/00revs.t
+SHA1 09550b732e993aad5a40ec15f4dec7b277f1debf t/00split_id.t
+SHA1 cbd4fbac25411ae26a75facec29adc5d276f7ba8 t/00uimachines.t
+SHA1 e6ca5cb63b44141f52cbd77526572e9b75baf42a t/00uitext.t
+SHA1 63bd697931705b13d5db57fbe4fba73e0d4973c2 t/00utils_cvs.t
+SHA1 9a81376dc399842f64d75035e65551649edc7bf8 t/00utils_p4.t
+SHA1 ce8d96dd5523fbce184ea843e2319e9bbcb2b8d7 t/00vcp_utils.t
+SHA1 1424811a0ad6aaa0fa7785a40feb41692f08cee3 t/01db_file.t
+SHA1 b2d8b7cfa18da8366c684d5941570e93424c48ec t/01db_file_big_records.t
+SHA1 fde8fb978bec5fdca8771de2cd612dffecdcef42 t/01db_file_sdbm.t
+SHA1 42c728774ab6875411a789c0cf27189295d8ebba t/01driver.t
+SHA1 a8852112e29fd77c280b006c7d9029d722244468 t/01ui.t
+SHA1 530c806f3e3f56b479ac0bab3cc7ac74fd99243f t/02dest.t
+SHA1 489129da7e63dea6c43fd10acba4a3484b56c947 t/02headrevsdb.t
+SHA1 8fa9f37cd26468a546ae16f81f7749c0a7ade455 t/02revmapdb.t
+SHA1 42c04a1a8e3c8c5c747c77ac5969e5891c886371 t/02source.t
+SHA1 c24fbe22359236bddb0364ec6044f67288e5d5c6 t/03dest_branch_diagram.t
+SHA1 7a7e2b70eba84808efb3b510302c8eab7dc73fa8 t/03dest_cvs.t
+SHA1 28e8c1abc963a73d513170b0311f00e47c89c0a4 t/03dest_metadb.t
+SHA1 cdda9a65bf2d87766a94cbe77cb589dd0308bc47 t/03dest_null.t
+SHA1 17a712cc916ad203f24357ce300abcbdd937ce7a t/03dest_p4.t
+SHA1 4566d016bd4fb3385f2bb4a1c165e58dc8b18a4c t/03dest_revml.t
+SHA1 736d42fee43adf3382556e33f5b0172f2e1fb081 t/03dest_topo_table.t
+SHA1 ef8b64179789f7a934ecfe53b506546cc8a40193 t/03dest_vss.t
+SHA1 dd28477e50cd72afa635d5f3f873511587254b0e t/03source_cvs.t
+SHA1 7b5383fb9b5a7648adcc0e5645f12eea75323fbd t/03source_metadb.t
+SHA1 d84e07bfdf14af734144834607eeff7c1b2a0ea7 t/03source_null.t
+SHA1 e074b24b1f194e926061f825a69c3e9c8b267b07 t/03source_p4.t
+SHA1 f8df9797d9e64a54051938900e2e08b031728abe t/03source_revml.t
+SHA1 2816353b313a33db628f64d7f91e0b33364021b6 t/03source_vss.t
+SHA1 069a4a70c284e444b3ba1deb6a8f339e3b342c84 t/09config_file_utils.t
+SHA1 d63c04a26aa5d59c783376d0e77c85f1f365e642 t/10compile_dtd.t
+SHA1 158e03c8241d52c0e0d17cd0c4933140f9e28c88 t/10vcp.t
+SHA1 82b15da21abe9eef3a01cb81e01c61f604cf4c23 t/50revml.t
+SHA1 7dc052b682e3dbcd2804699fd865175c96d0407c t/60identity.t
+SHA1 e259b4cec1a7b594c0d40bda9f75a2429ff0edc6 t/61addlabels.t
+SHA1 1f19218df7888346d202e3b1068875fc82da2e8a t/61changesets.t
+SHA1 50df69d61436c997d60e0266b65516cfe78975c7 t/61labelmap.t
+SHA1 3efe45d7f86c41187700cc9db3280f739ff0fd4f t/61map.t
+SHA1 af1c423c34b1f682178ddb446ccd47c3a651b5b4 t/61sort.t
+SHA1 5b41a8b6aefe3d3fed04b1ba4528142fdbd97b12 t/61stringedit.t
+SHA1 e3907c85dec50025f0a3e1c274d3a308c48fb107 t/80rcs_parser.t
+SHA1 7f8c2c9838ce6b156ca7fdf21beaa71418613e9d t/90revml2cvs_0.t
+SHA1 e8b4f1d9dbb6eab8b919bdc37ef2aaa886b85dc0 t/90revml2cvs_1.t
+SHA1 e56a801f637f9f14450ce5fc641851fbaf39ff4d t/90revml2cvs_2.t
+SHA1 21067a8983813d280a7622e80af37aa541cd2236 t/90revml2metadb.t
+SHA1 593fff8d64e1677791df45036dfbbb422fec0179 t/90revml2p4_0.t
+SHA1 6e2286efe09ec5b81aac8af2ae275734be6cc3b2 t/90revml2p4_1.t
+SHA1 7a7739b85adb8fe110570cc6da52daead122bb1f t/90revml2p4_2.t
+SHA1 9b8b4ba1ebb9bb14e3a12a3d987c1a85a6eac0aa t/90revml2p4_3.t
+SHA1 7989dd7a8aaf2bf3af758368ed10f626495956ce t/90revml2vss_0.t
+SHA1 679756456282fa9f660be4ead678aac91ee47f96 t/90revml2vss_1.t
+SHA1 c44d8d53e28237cde8e41a5e43d2ed5e3f9c9946 t/90revml2vss_2.t
+SHA1 8a351753333c225898af79f032cb2a9a9495fbf9 t/91cvs2revml.t
+SHA1 a61acb10a35229709088f8d76e464e56b858fb6c t/91p42revml.t
+SHA1 95872df8298a4387dd4ae4923d844317c93b7d0b t/91vss2revml.t
+SHA1 0645a44f21db070299e8e543cea290768c184705 t/95cvs2p4.t
+SHA1 e5a8acb2ddb87dc18b10b4c4f591edf8706e82f1 t/95p42cvs.t
+SHA1 b5e67de5bb97fc8d066a1934e44279f1a463c242 t/95p42p4.t
+SHA1 9d8a51df281e81f136accc64f7a44835447b1263 t/95vss2p4.t
+SHA1 d599b0dc466c89d0958cdb7bcd2957134347bfdc t/99p4_label_branch_rev_1.t
+SHA1 7f6fba01fea98026d829d8ab9387b0d59a0a477b t/buildpss.ksh,v
+SHA1 490cecbe26db8e28daf327eebbb78aa638219274 t/rcs_file,v
+SHA1 7fe81c9f6bee0b0df0ee1bb6ac3fcd50c1468bbe test_all_p4_versions.sh
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (FreeBSD)
+
+iD8DBQFBWHiQtLPdNzw1AaARAkCtAKC2WRxVNbF56yFsaH42vD8zPeqtUQCeOGPJ
+6mK+GgiCPt/hr1G2i/525eQ=
+=+TNf
+-----END PGP SIGNATURE-----
